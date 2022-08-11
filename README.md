@@ -3,6 +3,9 @@
 ## Quicky development setup
 ```bash
 yarn
+```
+## Start
+```bash
 yarn start
 ```
 # Job files
