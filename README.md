@@ -16,4 +16,4 @@ yarn start
 ```
 
 # About the job
-Script para adicionar codigo familiar e cpf para os tickets existentes na tabela schedule
+Script para adicionar codigo familiar e cpf aos tickets existentes na tabela schedule
