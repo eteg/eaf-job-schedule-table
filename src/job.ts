@@ -1,48 +1,26 @@
-import { getTickets, getUserFields } from "./helpers";
-// import {updateSchedule} from "./database"
+import { getTickets } from "./helpers";
+import { updateSchedule, disconnect } from "./database"
 
 const jobSchedule = async(): Promise<any>  =>{
-    const usersTickets:any[] = [];
     const tickets = await getTickets();
-     
-    tickets.map((t:any)=>{
-         usersTickets.push({ticketId:t.id, userId:t.requester_id})
-     })
-
-    const users = await getUserFields()
-
-    const saveListBd:any[] = []
     
-    usersTickets.map(async (t)=> {
-
-      await users.map((u:any ) =>{ 
-
-        if (u.id == t.userId){
-
-         saveListBd.push({
-            ticketId:String(t.ticketId),
-            userId:t.userId,
-            codFam:String(u.user_fields.codigo_da_familia),
-            cpf:String(u.user_fields.cpf)
+    await Promise.all(tickets.map(async(ticket: any) => {
+        if (ticket.ticket_form_id == 6551837227412) return
+        if (!ticket.external_id) return
+        if (!ticket.external_id.includes('doc_cpf')) return
+        const codFamiliar = ticket.custom_fields.filter((customField: any) => { 
+            if (customField.id == 6914306681364) return customField.value
         })
-       }
-
-    })
-
-    })
-    for(const obj of saveListBd){
-        console.log('Atualizando: '+ obj.ticketId)
-        // await updateSchedule(obj)
-    }
-
-  
-    
-    // const testeBd =  {
-    //     ticketId: String(99999),
-    //     userId: 7939724404633,
-    //     codFam: String('99999999999'),
-    //     cpf: String('12345678901')
-    //   }
+        const codFamiliarValue = codFamiliar[0].value
+        if (!codFamiliarValue) return
+        const CPF = ticket.external_id.replace('doc_cpf_','')
+        await updateSchedule({
+            ticketId: String(ticket.id),
+            codFam: String(codFamiliarValue),
+            cpf: String(CPF)
+        })
+    }))
+    await disconnect();
 }
 
 export{

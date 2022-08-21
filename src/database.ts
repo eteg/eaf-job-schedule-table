@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client'
+
 const prisma = new PrismaClient()
-
-
 
 interface objSchedule {
     ticketId: string;
@@ -9,16 +8,20 @@ interface objSchedule {
     cpf: string;
 }
 
-const updateSchedule = async (obj:objSchedule): Promise<void> =>{
+const disconnect = async (): Promise<void> =>{
+    await prisma.$disconnect()
+}
+
+const updateSchedule = async (obj: objSchedule): Promise<void> =>{
    await prisma.schedule.updateMany({
         where:{
             ticketId: obj.ticketId
         },
         data:{
             cod_familiar: obj.codFam,
-            cpf:obj.cpf
+            cpf: obj.cpf
         }
-    })
+    }).then(() => console.log(`Ticket updated ${obj.ticketId}`)).catch(e => console.log(e))
 }
 
-export{updateSchedule}
+export { updateSchedule, disconnect }
